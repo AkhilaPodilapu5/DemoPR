@@ -19,3 +19,4 @@ jobs:
         
         
         gh pr diff 2
+        git diff > eg.patch
