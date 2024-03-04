@@ -24,7 +24,8 @@ jobs:
         shell: bash
         run: |
           git fetch origin main
-          git diff origin/main..HEAD > mydiff
+          git diff origin/main..HEAD > mydiff.patch
           echo "mydiff = "
           cat mydiff
-          git apply demo.patch
+          
+          git apply mydiff.patch
