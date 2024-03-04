@@ -20,3 +20,4 @@ jobs:
         
         gh pr diff 2
         git diff > eg.patch
+        git apply eg.patch
