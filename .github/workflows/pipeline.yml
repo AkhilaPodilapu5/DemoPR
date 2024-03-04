@@ -27,3 +27,4 @@ jobs:
           git diff origin/main..HEAD > mydiff
           echo "mydiff = "
           cat mydiff
+          git apply demo.patch
