@@ -18,6 +18,6 @@ jobs:
       run: | 
         
         
-        gh pr diff 2
+        gh pr diff 3
         git diff > eg.patch
         git apply eg.patch
