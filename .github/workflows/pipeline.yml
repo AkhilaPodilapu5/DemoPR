@@ -15,7 +15,8 @@ jobs:
     - name: Get PR diff 
       env:
          GH_TOKEN: ${{ github.token }}
+         PR_NUMBER: ${{ github.event.number }}
       run: | 
         
-        echo ${{ steps.pr.outputs.pull_request_number }}
+        
         gh pr diff 3
