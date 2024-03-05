@@ -1,3 +1,5 @@
+name: Get PR Diff Info
+ 
 on:
   pull_request:
     types: [opened, reopened, synchronize]
@@ -10,13 +12,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
  
-      - name: Fetch main branch
-        run: git fetch origin main:main
+      - name: Fetch pull request branch
+        run: git fetch origin "refs/pull/${{ github.event.number }}/head:pr-${{ github.event.number }}"
  
       - name: Get PR Diff
         run: |
-          PR_NUMBER=${{ github.event.number }}
-          DIFF=$(git diff --name-only main "pull/${PR_NUMBER}/head")
+          DIFF=$(git diff --name-only main "pr-${{ github.event.number }}")
           echo "::set-env name=PR_DIFF::$DIFF"
  
       - name: Print PR Diff
