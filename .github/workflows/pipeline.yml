@@ -5,6 +5,21 @@ permissions:
       actions: read
       contents: read
 jobs: 
+  get_pr_info:
+    runs-on: ubuntu-latest
+ 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+ 
+      - name: Get PR Info
+        run: |
+          PR_ID=${{ github.event.number }}
+          SOURCE_BRANCH=${{ github.event.pull_request.head.ref }}
+          TARGET_BRANCH=${{ github.event.pull_request.base.ref }}
+          echo "Pull Request ID: $PR_ID"
+          echo "Source Branch: $SOURCE_BRANCH"
+          echo "Target Branch: $TARGET_BRANCH"
 
   build: 
 
