@@ -1,47 +1,21 @@
-on: 
-  pull_request: 
-    types: [opened, synchronize]   
-permissions:
-      actions: read
-      contents: read
-jobs: 
-  get_pr_info:
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+ 
+jobs:
+  build:
     runs-on: ubuntu-latest
  
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
  
-      - name: Get PR Info
+      - name: Get PR Diff
         run: |
-          PR_ID=${{ github.event.number }}
-          SOURCE_BRANCH=${{ github.event.pull_request.head.ref }}
-          TARGET_BRANCH=${{ github.event.pull_request.base.ref }}
-          echo "Pull Request ID: $PR_ID"
-          echo "Source Branch: $SOURCE_BRANCH"
-          echo "Target Branch: $TARGET_BRANCH"
-
-  build: 
-
-    runs-on: ubuntu-latest 
-    
-    steps: 
-    - name: Checkout code 
-      uses: actions/checkout@v2 
-
-    - name: Get Pull Request Number
-      id: pr
-      run: echo "::set-output name=pull_request_number::$(gh pr view --json number -q .number || echo "")"
-      env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-           
-
-   
-    - name: Get PR diff 
-      env:
-         GH_TOKEN: ${{ github.token }}
-         
-      run: | 
-        
-        
-        gh pr diff ${{ steps.pr.outputs.pull_request_number }}
+          PR_NUMBER=${{ github.event.number }}
+          DIFF=$(git diff --name-only origin/main "pull/${PR_NUMBER}/head")
+          echo "::set-env name=PR_DIFF::$DIFF"
+ 
+      - name: Print PR Diff
+        run: |
+          echo "PR Diff: $PR_DIFF"
