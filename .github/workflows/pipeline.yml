@@ -26,3 +26,4 @@ jobs:
           git diff origin/main..HEAD > mydiff
           echo "mydiff = "
           cat mydiff
+          diff -u OriginalFile UpdatedFile > PatchFile
