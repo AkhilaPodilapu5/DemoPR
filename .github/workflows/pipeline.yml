@@ -1,42 +1,38 @@
-name: Get PR Diff Info
- 
+name: sample-workflow
+
+# Run on all pull_request related events
 on:
   pull_request:
-    types: [opened, reopened, synchronize]
- 
+
+permissions:
+  contents: read # this is necessary for the Action to be able to read the contents of the repo
+
 jobs:
-  build:
+  sample:
     runs-on: ubuntu-latest
- 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
- 
-      - name: Get PR Info
-        id: pr_info
-        run: |
-          PR_NUMBER=${{ github.event.number }}
-          SOURCE_BRANCH=$(git show --no-patch --format='%H' "refs/pull/$PR_NUMBER/head")
-          TARGET_BRANCH=$(git show --no-patch --format='%H' "refs/pull/$PR_NUMBER/base")
-          echo "::set-output name=source_branch::$SOURCE_BRANCH"
-          echo "::set-output name=target_branch::$TARGET_BRANCH"
-          echo "::set-output name=pr_id::$PR_NUMBER"
- 
-      - name: Fetch source branch
-        run: git fetch origin ${{ steps.pr_info.outputs.source_branch }}:${{ steps.pr_info.outputs.source_branch }}
- 
-      - name: Fetch target branch
-        run: git fetch origin ${{ steps.pr_info.outputs.target_branch }}:${{ steps.pr_info.outputs.target_branch }}
- 
-      - name: Get PR Diff
-        run: |
-          SOURCE_BRANCH=${{ steps.pr_info.outputs.source_branch }}
-          TARGET_BRANCH=${{ steps.pr_info.outputs.target_branch }}
-          PR_NUMBER=${{ steps.pr_info.outputs.pr_id }}
-          DIFF=$(git diff --name-only $TARGET_BRANCH $SOURCE_BRANCH)
-          echo "::set-output name=diff::$DIFF"
- 
-      - name: Print PR Diff
-        run: |
-          echo "PR Diff: ${{ steps.pr_diff.outputs.diff }}"
+      # Checkout the repo
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # needed to checkout all branches for this Action to work
+
+      # Check the PR diff using the current branch and the base branch of the PR
+      - uses: GrantBirki/git-diff-action@vX.X.X
+        id: git-diff-action
+        with:
+          json_diff_file_output: diff.json
+          raw_diff_file_output: diff.txt
+          file_output_only: "true"
+
+      # Print the diff in JSON format
+      - name: print json diff
+        env:
+          DIFF: ${{ steps.git-diff-action.outputs.json-diff-path }}
+        run: cat $DIFF
+
+      # Print the diff in raw git format
+      - name: print raw diff
+        env:
+          DIFF: ${{ steps.git-diff-action.outputs.raw-diff-path }}
+        run: cat $DIFF
      
