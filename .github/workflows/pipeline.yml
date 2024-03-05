@@ -13,10 +13,16 @@ jobs:
 
    
     - name: Get PR diff 
+      # Check the PR diff using the current branch and the base branch of the PR
+      uses: GrantBirki/git-diff-action@vX.X.X
+      id: git-diff-action
+      with:
+        json_diff_file_output: diff.json
+        raw_diff_file_output: diff.txt
+        file_output_only: "true"
+
+      # Print the diff in JSON format
+    - name: print json diff
       env:
-         GH_TOKEN: ${{ github.token }}
-      run: | 
-        
-        
-        DIFF=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
-        echo "::set-output name=diff::$DIFF"
+          DIFF: ${{ steps.git-diff-action.outputs.json-diff-path }}
+          run: cat $DIFF
