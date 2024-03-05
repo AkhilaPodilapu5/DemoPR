@@ -12,12 +12,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
  
-      - name: Fetch pull request branch
-        run: git fetch origin "refs/pull/${{ github.event.number }}/head:pr-${{ github.event.number }}"
+      - name: Get default branch name
+        run: |
+          DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')
+          echo "::set-env name=DEFAULT_BRANCH::$DEFAULT_BRANCH"
+ 
+      - name: Fetch default branch
+        run: git fetch origin $DEFAULT_BRANCH:$DEFAULT_BRANCH
  
       - name: Get PR Diff
         run: |
-          DIFF=$(git diff --name-only main "pr-${{ github.event.number }}")
+          PR_NUMBER=${{ github.event.number }}
+          DIFF=$(git diff --name-only $DEFAULT_BRANCH "refs/pull/$PR_NUMBER/head")
           echo "::set-env name=PR_DIFF::$DIFF"
  
       - name: Print PR Diff
