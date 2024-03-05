@@ -10,10 +10,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
  
+      - name: Fetch main branch
+        run: git fetch origin main:main
+ 
       - name: Get PR Diff
         run: |
           PR_NUMBER=${{ github.event.number }}
-          DIFF=$(git diff --name-only origin/main "pull/${PR_NUMBER}/head")
+          DIFF=$(git diff --name-only main "pull/${PR_NUMBER}/head")
           echo "::set-env name=PR_DIFF::$DIFF"
  
       - name: Print PR Diff
