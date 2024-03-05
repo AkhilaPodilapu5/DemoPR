@@ -5,7 +5,7 @@ on:
     types: [opened, reopened, synchronize]
  
 jobs:
-  get_pr_info:
+  build:
     runs-on: ubuntu-latest
  
     steps:
@@ -13,11 +13,24 @@ jobs:
         uses: actions/checkout@v2
  
       - name: Get PR Info
+        id: pr_info
         run: |
-          PR_ID=${{ github.event.number }}
-          SOURCE_BRANCH=${{ github.event.pull_request.head.ref }}
-          TARGET_BRANCH=${{ github.event.pull_request.base.ref }}
-          echo "Pull Request ID: $PR_ID"
-          echo "Source Branch: $SOURCE_BRANCH"
-          echo "Target Branch: $TARGET_BRANCH"
+          PR_NUMBER=${{ github.event.number }}
+          SOURCE_BRANCH=$(git show --no-patch --format='%H' "refs/pull/$PR_NUMBER/head")
+          TARGET_BRANCH=$(git show --no-patch --format='%H' "refs/pull/$PR_NUMBER/base")
+          echo "::set-output name=source_branch::$SOURCE_BRANCH"
+          echo "::set-output name=target_branch::$TARGET_BRANCH"
+          echo "::set-output name=pr_id::$PR_NUMBER"
+ 
+      - name: Get PR Diff
+        run: |
+          SOURCE_BRANCH=${{ steps.pr_info.outputs.source_branch }}
+          TARGET_BRANCH=${{ steps.pr_info.outputs.target_branch }}
+          PR_NUMBER=${{ steps.pr_info.outputs.pr_id }}
+          DIFF=$(git diff --name-only $TARGET_BRANCH $SOURCE_BRANCH)
+          echo "::set-output name=diff::$DIFF"
+ 
+      - name: Print PR Diff
+        run: |
+          echo "PR Diff: ${{ steps.pr_diff.outputs.diff }}"
      
