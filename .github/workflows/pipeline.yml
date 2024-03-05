@@ -18,4 +18,5 @@ jobs:
       run: | 
         
         
-        gh pr diff 3
+        DIFF=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+        echo "::set-output name=diff::$DIFF"
