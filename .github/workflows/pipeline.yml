@@ -23,7 +23,7 @@ jobs:
         shell: bash
         run: |
           git fetch origin main
-          git diff origin/main..HEAD > patch.diff
-          git apply -3 patch.diff
-          cat patch.diff
+          git diff origin/main..HEAD > mydiff.diff
+          
+          cat mydiff.diff
           
