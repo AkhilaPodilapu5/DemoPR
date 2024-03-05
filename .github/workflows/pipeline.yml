@@ -24,6 +24,6 @@ jobs:
         run: |
           git fetch origin main
           git diff origin/main..HEAD > patch.diff
-          git apply patch.diff
+          git apply --ignore-space-change --ignore-whitespace patch.diff
           cat patch.diff
           
