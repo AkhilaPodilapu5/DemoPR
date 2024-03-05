@@ -15,9 +15,6 @@ jobs:
       - name: Get PR Diff
         run: |
           PR_NUMBER=${{ github.event.number }}
-          DIFF=$(git diff --name-only origin/main "pull/${PR_NUMBER}/head")
-          echo "::set-env name=PR_DIFF::$DIFF"
+          gh pr diff PR_NUMBER
  
-      - name: Print PR Diff
-        run: |
-          echo "PR Diff: $PR_DIFF"
+     
