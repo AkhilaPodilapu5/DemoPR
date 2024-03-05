@@ -11,12 +11,19 @@ jobs:
     - name: Checkout code 
       uses: actions/checkout@v2 
 
+    - name: Get Pull Request Number
+      id: pr
+      run: echo "::set-output name=pull_request_number::$(gh pr view --json number -q .number || echo "")"
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+           
+
    
     - name: Get PR diff 
       env:
          GH_TOKEN: ${{ github.token }}
-         PR_NUMBER: ${{ github.event.number }}
+         
       run: | 
         
         
-        gh pr diff 3
+        gh pr diff ${{ steps.pr.outputs.pull_request_number }}
