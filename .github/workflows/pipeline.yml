@@ -18,4 +18,4 @@ jobs:
       run: | 
         
         echo ${{ steps.pr.outputs.pull_request_number }}
-        gh pr diff 9
+        gh pr diff 3
