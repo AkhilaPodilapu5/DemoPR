@@ -1,26 +1,21 @@
-name: PR Diff to API
- 
-on:
-  pull_request:
-    types: [opened, synchronize]
- 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-      
-    
-      
-    - name: Get PR diff
-      run: |
-        DIFF=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
-        echo "::set-output name=diff::$DIFF"
-      
-    - name: Store diff in API
+on: 
+  pull_request: 
+    types: [opened, synchronize]   
+
+jobs: 
+
+  build: 
+
+    runs-on: ubuntu-latest 
+    steps: 
+    - name: Checkout code 
+      uses: actions/checkout@v2 
+
+   
+    - name: Get PR diff 
       env:
-        API_URL: ${{ secrets.API_URL }}
-      run: |
-curl -X POST -d "${{ steps.build.outputs.diff }}" $API_URL
+         GH_TOKEN: ${{ github.token }}
+      run: | 
+        
+        
+        gh pr diff 9
