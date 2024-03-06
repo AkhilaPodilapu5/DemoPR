@@ -11,20 +11,17 @@ jobs:
     runs-on: ubuntu-latest 
     env:
       PR_AUTHOR_GITHUB_ID: ${{ github.event.pull_request.user.login }}
-      REVIEWER_DETAILS: ${{ github.event.inputs.reviewers }}
+      REVIEWER_DETAILS: ${{ github.repository_owner }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
     steps:
       - name: Find Github id of PR AUTHOR
         run: |
           echo "PR author: ${PR_AUTHOR_GITHUB_ID}"
-      - name: Add Reviewers
-        uses: madrapps/add-reviewers@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          reviewers: john,kramer,seinfeld
-          re-request-when-approved: true
-          re-request-when-changes-requested: true
+      - name: Reviewer
+        run: |
+          echo "reviewr:${{ github.repository_owner }}"
+        
      
       - name: Checkout pull request HEAD
         id: checkout_pr_head
@@ -38,15 +35,7 @@ jobs:
           git fetch origin main
           git diff origin/main..HEAD > mydiff.diff
 
-      - name: Send PR details as a comment
-        run: |
-          COMMENT="PR author: ${PR_AUTHOR_GITHUB_ID}\n\nDiff content:"
-          echo "$COMMENT" > comment.txt
-          cat mydiff.diff >> comment.txt
-          echo -e "\n\nReviewers:\n${REVIEWER_DETAILS}" >> comment.txt
-          gh issue comment ${{ github.event.pull_request.number }} --body "$(cat comment.txt)"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
           
 
         
