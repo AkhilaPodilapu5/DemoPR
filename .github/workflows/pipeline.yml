@@ -35,14 +35,10 @@ jobs:
         run: |
           git fetch origin main
           git diff origin/main..HEAD > mydiff.diff
-      - name: Send PR details as a comment
-        run: |
-         COMMENT="PR author: ${PR_AUTHOR_GITHUB_ID}\n\nDiff content:"
-         echo "$COMMENT" > comment.txt
-         cat mydiff.diff >> comment.txt
-         curl -s -H "Authorization: $GITHUB_TOKEN" -X POST -d "{\"body\":\"$(< comment.txt)\"}" "${{ github.api_url }}/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
-         env:
-           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          gh api \
+          -H "Accept: application/vnd.github+json" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+           /repos/OWNER/REPO/pulls
 
 
           
