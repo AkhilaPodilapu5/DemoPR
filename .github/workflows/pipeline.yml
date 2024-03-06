@@ -9,13 +9,12 @@ jobs:
     runs-on: ubuntu-latest 
     env:
       PR_AUTHOR_GITHUB_ID: ${{ github.event.pull_request.user.login }}
-      PR_TITLE: ${{ github.event.pull_request.title }}
-      PR_URL: ${{ github.event.pull_request.url}}
+      
     steps:
       - name: Find Github id of PR AUTHOR
         run: |
           echo "PR author: ${PR_AUTHOR_GITHUB_ID}"
-          echo "Pull Request URL: ${{ PR_URL }}"
+          
           
       - name: Checkout pull request HEAD
         id: checkout_pr_head
@@ -28,6 +27,16 @@ jobs:
         run: |
           git fetch origin main
           git diff origin/main..HEAD > mydiff.diff
+      - name: Send PR event info to API
+        run: |
+          # Replace this URL with the RequestBin URL or your API endpoint
+          API_ENDPOINT="https://your-requestbin-url.here"
+
+          # Constructing the JSON payload
+          PAYLOAD="{\"pr_author\": \"${PR_AUTHOR_GITHUB_ID}\", \"diff_content\": \"$(cat mydiff.diff | base64)\"}"
+
+          # Sending the payload to the API
+          curl -X POST -H "Content-Type: application/json" -d "${PAYLOAD}" "${API_ENDPOINT}"
 
           
 
