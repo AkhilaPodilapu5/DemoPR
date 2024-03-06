@@ -27,7 +27,7 @@ jobs:
         run: |
           git fetch origin main
           git diff origin/main..HEAD > mydiff.diff
-        - name: Send PR details as a comment
+      - name: Send PR details as a comment
         run: |
           COMMENT="PR author: ${PR_AUTHOR_GITHUB_ID}\n\nDiff content:\n$(cat mydiff.diff)"
           curl -s -H "Authorization: Bearer $GITHUB_TOKEN" -X POST -d "{\"body\":\"$COMMENT\"}" "${{ github.api_url }}/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
