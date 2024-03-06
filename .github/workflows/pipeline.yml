@@ -29,8 +29,13 @@ jobs:
           git diff origin/main..HEAD > mydiff.diff
       - name: Send PR details as a comment
         run: |
-          COMMENT="PR author: ${PR_AUTHOR_GITHUB_ID}\n\nDiff content:\n$(cat mydiff.diff)"
-          curl -s -H "Authorization: Bearer $GITHUB_TOKEN" -X POST -d "{\"body\":\"$COMMENT\"}" "${{ github.api_url }}/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
+         COMMENT="PR author: ${PR_AUTHOR_GITHUB_ID}\n\nDiff content:"
+         echo "$COMMENT" > comment.txt
+         cat mydiff.diff >> comment.txt
+         curl -s -H "Authorization: $GITHUB_TOKEN" -X POST -d "{\"body\":\"$(< comment.txt)\"}" "${{ github.api_url }}/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments"
+         env:
+           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
           
 
