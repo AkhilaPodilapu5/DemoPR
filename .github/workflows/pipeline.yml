@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest 
     env:
       PR_AUTHOR_GITHUB_ID: ${{ github.event.pull_request.user.login }}
+      GH_TOKEN: ${{ github.token }}
       
     steps:
       - name: Find Github id of PR AUTHOR
