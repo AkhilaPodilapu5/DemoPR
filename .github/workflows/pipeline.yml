@@ -41,6 +41,7 @@ jobs:
           
           #PULL_NUMBER="${{ github.event.pull_request.number }}"
       - name: Send details to API
+        shell: bash
         run: |
           COMMENT="PR author: ${PR_AUTHOR_GITHUB_ID}\nReviewer: $REVIEWER_DETAILS\nPR URL: ${{ github.event.pull_request.html_url }}\n\nDiff content:\n$(cat mydiff)"
           echo "Comment content:\n$COMMENT"
