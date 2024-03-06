@@ -39,18 +39,14 @@ jobs:
           echo "mydiff = "
           cat mydiff
           
-          #PULL_NUMBER="${{ github.event.pull_request.number }}"
+          
       - name: Send details to API
         shell: bash
         run: |
-          COMMENT="PR author: ${PR_AUTHOR_GITHUB_ID}\nReviewer: $REVIEWER_DETAILS\nPR URL: ${{ github.event.pull_request.html_url }}\n\nDiff content:\n$(cat mydiff)"
-          echo "Comment content:\n$COMMENT"
-
-          curl -X POST \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d "{\"body\":\"$COMMENT\"}" \
-            "${{ github.event.pull_request.comments_url }}"
+          PULL_NUMBER="${{ github.event.pull_request.number }}"
+          API_URL="https://api.example.com/${REVIEWER_DETAILS}/${REPO}/pulls/${PULL_NUMBER}"
+          
+          echo "API URL: $API_URL"
           
 
         
