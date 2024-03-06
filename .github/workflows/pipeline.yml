@@ -31,13 +31,15 @@ jobs:
           fetch-depth: 0
           
           
-      - name: Print diff 
+      - name: print-diff
+        shell: bash
         run: |
-          PULL_NUMBER="${{ github.event.pull_request.number }}"
           git fetch origin main
-          git diff origin/main..HEAD > mydiff.diff
+          git diff origin/main..HEAD > mydiff
+          echo "mydiff = "
+          cat mydiff
           
-          
+          #PULL_NUMBER="${{ github.event.pull_request.number }}"
           
       
           
