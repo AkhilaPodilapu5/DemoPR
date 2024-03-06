@@ -20,10 +20,12 @@ jobs:
       - name: Get reviewer details
         id: get_reviewers
         run: |
-          REVIEWER_DETAILS=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" 
-          "${{ github.api_url }}/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews" | jq -r '.[].user.login // empty' | uniq)
+          REVIEWER_DETAILS=$(curl -s -H "Authorization: $GH_TOKEN" \
+            "https://api.github.com/repos/AkhilaPodilapu5/DemoPR/pulls/4/reviews" | jq -r '.[].user.login // empty' | uniq)
           echo "Reviewers: $REVIEWER_DETAILS"
           echo "Reviewers: $REVIEWER_DETAILS" > reviewers.txt
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
       - name: Checkout pull request HEAD
         id: checkout_pr_head
         uses: actions/checkout@v2
