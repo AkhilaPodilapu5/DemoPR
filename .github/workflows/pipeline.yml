@@ -18,6 +18,13 @@ jobs:
       - name: Find Github id of PR AUTHOR
         run: |
           echo "PR author: ${PR_AUTHOR_GITHUB_ID}"
+      - name: Add Reviewers
+        uses: madrapps/add-reviewers@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          reviewers: john,kramer,seinfeld
+          re-request-when-approved: true
+          re-request-when-changes-requested: true
      
       - name: Checkout pull request HEAD
         id: checkout_pr_head
