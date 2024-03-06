@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest 
     env:
       PR_AUTHOR_GITHUB_ID: ${{ github.event.pull_request.user.login }}
+      REPO_OWNER: ${{ github.repository_owner }}
+      REPO_NAME: ${{ github.repository_name }}
     steps:
       - name: Find Github id of PR AUTHOR
         run: |
@@ -19,11 +21,26 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
-      - name: print-diff
-        shell: bash
+      - name: Print diff and gather PR details
+        id: gather_pr_details
         run: |
           git fetch origin main
           git diff origin/main..HEAD > mydiff.diff
-          
-          cat mydiff.diff
+
+          # Extracting necessary information
+          PR_TITLE=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "${{ github.api_url }}/repos/${REPO_OWNER}/${REPO_NAME}/pulls/${{ github.event.pull_request.number }}" | jq -r '.title')
+          PR_URL=$(echo "${{ github.event.pull_request.html_url }}")
+
+          # Getting details of the person who should approve the PR
+          REVIEWERS=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "${{ github.api_url }}/repos/${REPO_OWNER}/${REPO_NAME}/pulls/${{ github.event.pull_request.number }}/requested_reviewers" | jq -r '.users[].login')
+
+          # Creating a JSON payload
+          PAYLOAD="{\"pr_author\": \"${PR_AUTHOR_GITHUB_ID}\", \"pr_title\": \"${PR_TITLE}\", \"pr_url\": \"${PR_URL}\", \"reviewers\": \"${REVIEWERS}\"}"
+
+          # Outputting the payload for reference
+          echo "PR Details Payload: ${PAYLOAD}"
+
+          # Save the payload as an output variable
+          echo "::set-output name=pr_details_payload::${PAYLOAD}"
+        
           
