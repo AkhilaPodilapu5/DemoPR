@@ -11,21 +11,14 @@ jobs:
     runs-on: ubuntu-latest 
     env:
       PR_AUTHOR_GITHUB_ID: ${{ github.event.pull_request.user.login }}
-      GH_TOKEN: ${{ github.token }}
+      REVIEWER_DETAILS: ${{ github.event.inputs.reviewers }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
     steps:
       - name: Find Github id of PR AUTHOR
         run: |
           echo "PR author: ${PR_AUTHOR_GITHUB_ID}"
-      - name: Get reviewer details
-        id: get_reviewers
-        run: |
-          REVIEWER_DETAILS=$(curl -s -H "Authorization: $GH_TOKEN" \
-            "https://api.github.com/repos/AkhilaPodilapu5/DemoPR/pulls/4/reviews" | jq -r '.[].user.login // empty' | uniq)
-          echo "Reviewers: $REVIEWER_DETAILS"
-          echo "Reviewers: $REVIEWER_DETAILS" > reviewers.txt
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+     
       - name: Checkout pull request HEAD
         id: checkout_pr_head
         uses: actions/checkout@v2
@@ -37,6 +30,16 @@ jobs:
         run: |
           git fetch origin main
           git diff origin/main..HEAD > mydiff.diff
+
+      - name: Send PR details as a comment
+        run: |
+          COMMENT="PR author: ${PR_AUTHOR_GITHUB_ID}\n\nDiff content:"
+          echo "$COMMENT" > comment.txt
+          cat mydiff.diff >> comment.txt
+          echo -e "\n\nReviewers:\n${REVIEWER_DETAILS}" >> comment.txt
+          gh issue comment ${{ github.event.pull_request.number }} --body "$(cat comment.txt)"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
 
         
