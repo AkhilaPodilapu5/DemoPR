@@ -33,15 +33,12 @@ jobs:
           
       - name: Print diff 
         run: |
+          PULL_NUMBER="${{ github.event.pull_request.number }}"
           git fetch origin main
           git diff origin/main..HEAD > mydiff.diff
-          PULL_NUMBER="${{ github.event.pull_request.number }}"
           
-          API_URL="https://api.github.com/repos/${OWNER}/${REPO}/pulls/${PULL_NUMBER}"
-          PULL_REQUEST_DETAILS=$(curl -s -H "Authorization: Bearer $GH_TOKEN" $API_URL)
           
-          echo "Pull Request Details: $PULL_REQUEST_DETAILS"
-
+          
       
           
 
