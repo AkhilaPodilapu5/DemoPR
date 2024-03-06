@@ -20,28 +20,19 @@ jobs:
       - name: Get reviewer details
         id: get_reviewers
         run: |
-          REVIEWER_DETAILS=$(curl -s -H "Authorization: $GITHUB_TOKEN" "${{ github.api_url }}/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/requested_reviewers" | jq -r '.users[].login // empty')
-          echo "Reviewers: $REVIEWER_DETAILS"
-          echo "Reviewers: $REVIEWER_DETAILS" > reviewers.txt
-          
-          
+          gh pr view ${{ github.event.pull_request.number }} --json requested_reviewers -q .requested_reviewers[].login > reviewers.txt
+               
       - name: Checkout pull request HEAD
         id: checkout_pr_head
         uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
+          
       - name: Print diff 
-      
         run: |
           git fetch origin main
           git diff origin/main..HEAD > mydiff.diff
-          gh api \
-          -H "Accept: application/vnd.github+json" \
-          -H "X-GitHub-Api-Version: 2022-11-28" \
-           /repos/OWNER/REPO/pulls
-
-
           
 
         
