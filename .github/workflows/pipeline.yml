@@ -1,22 +1,32 @@
-on: 
-  pull_request: 
-    types: [opened, synchronize]   
+on:
+  pull_request:
+    types: [opened, synchronize]
 
-jobs: 
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-  build: 
+    steps:
+      - name: Checkout pull request
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
 
-    runs-on: ubuntu-latest 
-    steps: 
-    - name: Checkout code 
-      uses: actions/checkout@v2 
-
-   
-    - name: Get PR diff 
-      env:
-         GH_TOKEN: ${{ github.token }}
-      run: | 
-        PR_ID=${{ github.event.number }}
-
-        gh pr diff PR_ID
-
+      - name: Get pull request details
+        id: pr_details
+        run: |
+          OWNER="${{ github.repository_owner }}"
+          REPO="${{ github.repository }}"
+          PULL_NUMBER="${{ github.event.pull_request.number }}"
+          
+          API_URL="https://api.github.com/repos/${OWNER}/${REPO}/pulls/${PULL_NUMBER}"
+          PULL_REQUEST_DETAILS=$(curl -s -H "Authorization: Bearer $GH_TOKEN" $API_URL)
+          
+          echo "Pull Request Details: $PULL_REQUEST_DETAILS"
+          
+          # Extract any specific information you need from $PULL_REQUEST_DETAILS
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
