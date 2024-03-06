@@ -20,8 +20,7 @@ jobs:
       - name: Get reviewer details
         id: get_reviewers
         run: |
-          gh pr view ${{ github.event.pull_request.number }} --json requested_reviewers -q .requested_reviewers[].login > reviewers.txt
-               
+          gh pr view ${{ github.event.pull_request.number }} --json reviewRequests --json '.reviewRequests[].requestedReviewer.login' | jq -r '.[]' > reviewers.txt
       - name: Checkout pull request HEAD
         id: checkout_pr_head
         uses: actions/checkout@v2
