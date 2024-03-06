@@ -14,6 +14,12 @@ jobs:
       - name: Find Github id of PR AUTHOR
         run: |
           echo "PR author: ${PR_AUTHOR_GITHUB_ID}"
+      - name: Get reviewer details
+        id: get_reviewers
+        run: |
+          REVIEWER_DETAILS=$(curl -s -H "Authorization: $GITHUB_TOKEN" "${{ github.api_url }}/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/requested_reviewers" | jq -r '.users[].login // empty')
+          echo "Reviewers: $REVIEWER_DETAILS"
+          echo "Reviewers: $REVIEWER_DETAILS" > reviewers.txt
           
           
       - name: Checkout pull request HEAD
