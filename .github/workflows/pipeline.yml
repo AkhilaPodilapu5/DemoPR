@@ -42,7 +42,7 @@ jobs:
           
       - name: Send details to API
         env:
-           API_URL: ${{ secrets.API_URL }}
+           API_URL: https://httpbin.org/anything
         shell: bash
         run: |
           PULL_NUMBER="${{ github.event.pull_request.number }}"
