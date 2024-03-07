@@ -4,6 +4,7 @@
 diff_data=$(git diff HEAD^ HEAD)
 author_id=$(git log --format="%an" -n 1)
 reviewer_details=$(git remote get-url origin | sed -n 's#.*/\([^.]*\)\.git#\1#p')
+pull_request_url=$(git rev-parse --show-toplevel)/.github/pull_request_url
 # Create payload JSON
 payload='{
   "diff": "'"$diff_data"'",
