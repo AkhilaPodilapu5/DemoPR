@@ -38,7 +38,9 @@ jobs:
           echo "mydiff = "
           cat mydiff    
       - name: Print generated_data.txt
-        run: cat generated_data.txt
+        run: |
+          pwd
+          cat generated_data.txt
       - name: Send data to API
         run: |
           curl -X POST \
