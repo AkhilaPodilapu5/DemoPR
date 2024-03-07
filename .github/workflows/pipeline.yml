@@ -46,7 +46,7 @@ jobs:
         shell: bash
         run: |
           PULL_NUMBER="${{ github.event.pull_request.number }}"
-          curl -X POST -d "${{ steps.build.outputs.diff }}" $API_URL
+          curl -X POST -d "${{ steps.outputs.mydiff }}" $API_URL
           
 
         
