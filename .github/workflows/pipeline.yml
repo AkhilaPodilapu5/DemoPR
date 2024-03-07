@@ -1,32 +1,45 @@
-on:
-  pull_request:
-    types: [opened, synchronize]
+on: 
+  pull_request: 
+    types: [opened, synchronize]   
+permissions:
+     contents: read
+     pull-requests: read
+     actions: write
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+jobs: 
+  build: 
+    runs-on: ubuntu-latest 
     env:
-      GH_TOKEN: ${{ secrets.GH_TOKEN }}
-
+      PR_AUTHOR_GITHUB_ID: ${{ github.event.pull_request.user.login }}
+      REVIEWER_DETAILS: ${{ github.repository_owner }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
     steps:
-      - name: Checkout pull request
+      - name: Find Github id of PR AUTHOR
+        run: |
+          echo "PR author: ${PR_AUTHOR_GITHUB_ID}" > generated_data.txt
+      - name: Reviewer
+        run: |
+          echo "reviewr:${{ github.repository_owner }}" > generated_data.txt
+      - name: Get Pull Request URL
+        run: |
+         echo "Pull Request URL: ${{ github.event.pull_request.html_url }}" > generated_data.txt    
+      - name: Checkout pull request HEAD
+        id: checkout_pr_head
         uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
-          fetch-depth: 0
-
-      - name: Get pull request details
-        id: pr_details
+          fetch-depth: 0    
+      - name: print-diff
+        shell: bash
         run: |
-          OWNER="${{ github.repository_owner }}"
-          REPO="${{ github.repository }}"
-          PULL_NUMBER="${{ github.event.pull_request.number }}"
-          
-          API_URL="https://api.github.com/repos/${OWNER}/${REPO}/pulls/${PULL_NUMBER}"
-          PULL_REQUEST_DETAILS=$(curl -s -H "Authorization: Bearer $GH_TOKEN" $API_URL)
-          
-          echo "Pull Request Details: $PULL_REQUEST_DETAILS"
-          
-          # Extract any specific information you need from $PULL_REQUEST_DETAILS
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          git fetch origin main
+          git diff origin/main..HEAD > mydiff
+          echo "mydiff = "
+          cat mydiff > generated_data.txt          
+      - name: Send data to API
+        run: |
+          curl -X POST \
+           -H "Content-Type: application/json" \
+           -d "@generated_data.txt" \
+           "https://httpbin.org/anything"   
