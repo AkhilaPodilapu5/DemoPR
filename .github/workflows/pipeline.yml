@@ -47,9 +47,8 @@ jobs:
 
       - name: Set up environment variables
         run: |
-           echo "PAYLOAD_FILE_CONTENT=$(cat payload.json)" >> $GITHUB_ENV
-           echo "API_ENDPOINT=https://httpbin.org/anything" >> $GITHUB_ENV
-
+           echo "PAYLOAD_FILE_CONTENT=$(cat payload.json)" >> $env
+           echo "API_ENDPOINT=https://httpbin.org/anything" >> $env
       - name: Send data to API
         run: |
           curl -X POST \
