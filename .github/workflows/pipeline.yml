@@ -21,7 +21,9 @@ jobs:
       - name: Reviewer
         run: |
           echo "reviewr:${{ github.repository_owner }}"
-        
+      - name: Get Pull Request URL
+        run: |
+         echo "Pull Request URL: ${{ github.event.pull_request.html_url }}"
      
       - name: Checkout pull request HEAD
         id: checkout_pr_head
