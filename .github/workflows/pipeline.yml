@@ -18,13 +18,13 @@ jobs:
     steps:
       - name: Find Github id of PR AUTHOR
         run: |
-          echo "PR author: ${PR_AUTHOR_GITHUB_ID}" >> generated_data.txt
+          echo "PR author: ${PR_AUTHOR_GITHUB_ID}" >> $GITHUB_WORKSPACE/generated_data.txt
       - name: Reviewer
-        run: echo "reviewr:${{ github.repository_owner }}" >> generated_data.txt
+        run: echo "reviewr:${{ github.repository_owner }}" >> $GITHUB_WORKSPACE/generated_data.txt
       - name: Get Pull Request URL
         run: |
-          echo "Pull Request URL: ${{ github.event.pull_request.html_url }}" >> generated_data.txt
-          cat generated_data.txt
+          echo "Pull Request URL: ${{ github.event.pull_request.html_url }}" >> $GITHUB_WORKSPACE/generated_data.txt
+          cat $GITHUB_WORKSPACE/generated_data.txt
       - name: Checkout pull request HEAD
         uses: actions/checkout@v2
         with:
@@ -34,24 +34,21 @@ jobs:
         shell: bash
         run: |
           git fetch origin main
-          git diff origin/main..HEAD > mydiff
-          echo "mydiff = $(cat mydiff)" >> diff_data.txt
-          cat diff_data.txt
+          git diff origin/main..HEAD > $GITHUB_WORKSPACE/diff_data.txt
+          echo "mydiff = $(cat $GITHUB_WORKSPACE/diff_data.txt)"
       - name: see the details in generated data and diff
         run: |
-          cat generated_data.txt
-          cat diff_data.txt
-           
-           
+          cat $GITHUB_WORKSPACE/generated_data.txt
+          cat $GITHUB_WORKSPACE/diff_data.txt
       - name: Send data to API
         run: |
           curl -X POST \
             -H "Content-Type: application/json" \
-            -d "@generated_data.txt" \
+            -d "@$GITHUB_WORKSPACE/generated_data.txt" \
             "https://httpbin.org/anything"
-
           curl -X POST \
             -H "Content-Type: text/plain" \
-            -d "@diff.txt" \
+            -d "@$GITHUB_WORKSPACE/diff_data.txt" \
             "https://httpbin.org/anything"
+
           
