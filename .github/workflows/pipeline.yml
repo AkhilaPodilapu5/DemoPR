@@ -16,12 +16,6 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - name: Debug Info
-        run: |
-          echo "Current directory: $(pwd)"
-          ls -la
-          ls -la $GITHUB_WORKSPACE
-
       - name: Generate data
         run: |
           echo "PR author: ${PR_AUTHOR_GITHUB_ID}" > $GITHUB_WORKSPACE/generated_data.txt
@@ -44,12 +38,13 @@ jobs:
 
       - name: Send data to API
         run: |
+          cd $GITHUB_WORKSPACE  # Change to the workspace directory
           curl -X POST \
             -H "Content-Type: application/json" \
-            -d "@$GITHUB_WORKSPACE/generated_data.txt" \
+            -d "@generated_data.txt" \
             "https://httpbin.org/anything"
 
           curl -X POST \
             -H "Content-Type: text/plain" \
-            -d "@$GITHUB_WORKSPACE/diff_data.txt" \
+            -d "@diff_data.txt" \
             "https://httpbin.org/anything"
