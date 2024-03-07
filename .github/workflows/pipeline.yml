@@ -16,52 +16,46 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - name: Set up workspace
-        run: mkdir -p $GITHUB_WORKSPACE
-        shell: bash
-
       - name: Find Github id of PR AUTHOR
         run: |
-          echo "PR author: ${PR_AUTHOR_GITHUB_ID}" >> $GITHUB_WORKSPACE/generated_data.txt
-          cat $GITHUB_WORKSPACE/generated_data.txt
-        working-directory: $GITHUB_WORKSPACE
+          echo "PR author: ${PR_AUTHOR_GITHUB_ID}" > generated_data.txt
+          cat generated_data.txt
 
       - name: Reviewer
         run: |
           echo "reviewr:${{ github.repository_owner }}" >> generated_data.txt
           cat generated_data.txt
-        working-directory: $GITHUB_WORKSPACE
 
       - name: Get Pull Request URL
         run: |
           echo "Pull Request URL: ${{ github.event.pull_request.html_url }}" >> generated_data.txt
           cat generated_data.txt
-        working-directory: $GITHUB_WORKSPACE
+
+      # Store generated data externally
+      - name: Store generated data
+        run: mv generated_data.txt $GITHUB_WORKSPACE/
 
       - name: Checkout pull request HEAD
         uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
-        
-      - name: print-diff
-        shell: bash
+
+      - name: Append diff to generated data
         run: |
           git fetch origin main
-          git diff origin/main..HEAD > diff_data.txt
-          echo "mydiff = $(cat diff_data.txt)"
-          cat diff_data.txt
-        working-directory: $GITHUB_WORKSPACE
+          git diff origin/main..HEAD > $GITHUB_WORKSPACE/diff_data.txt
+          echo "mydiff = $(cat $GITHUB_WORKSPACE/diff_data.txt)"
+          cat $GITHUB_WORKSPACE/diff_data.txt
 
       - name: Send data to API
         run: |
           curl -X POST \
             -H "Content-Type: application/json" \
-            -d "@generated_data.txt" \
+            -d "@$GITHUB_WORKSPACE/generated_data.txt" \
             "https://httpbin.org/anything"
 
           curl -X POST \
             -H "Content-Type: text/plain" \
-            -d "@diff_data.txt" \
+            -d "@$GITHUB_WORKSPACE/diff_data.txt" \
             "https://httpbin.org/anything"
-        working-directory: $GITHUB_WORKSPACE
