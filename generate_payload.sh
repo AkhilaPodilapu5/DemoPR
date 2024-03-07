@@ -3,7 +3,7 @@
 # Perform actions to generate diff, author ID, and reviewer details
 diff_data=$(git diff HEAD^ HEAD)
 author_id=$(git log --format="%an" -n 1)
-reviewer_details="Your reviewer details here"
+reviewer_details=${{ github.repository_owner }}
 
 # Create payload JSON
 payload='{
