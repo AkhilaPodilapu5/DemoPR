@@ -1,58 +1,42 @@
 on:
   pull_request:
-    types: [opened, synchronize]   
-permissions:
-     contents: read
-     pull-requests: read
-     actions: write
+    types: [opened, synchronize]
 
-jobs: 
-  build: 
-    runs-on: ubuntu-latest 
+permissions:
+  contents: read
+  pull-requests: read
+  actions: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
     env:
       PR_AUTHOR_GITHUB_ID: ${{ github.event.pull_request.user.login }}
       REVIEWER_DETAILS: ${{ github.repository_owner }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
+
     steps:
-      - name: Set up working directory
-        run: mkdir -p $HOME/workdir
-        working-directory: $HOME
       - name: Find Github id of PR AUTHOR
-        working-directory: $HOME/workdir
-        run: |
-          echo "PR author: ${PR_AUTHOR_GITHUB_ID}" >> generated_data.txt
-          cat generated_data.txt
+        run: echo "PR author: ${PR_AUTHOR_GITHUB_ID}" >> generated_data.txt
       - name: Reviewer
-        working-directory: $HOME/workdir
-        run: |
-          echo "reviewr:${{ github.repository_owner }}" >> generated_data.txt
-          cat generated_data.txt
+        run: echo "reviewr:${{ github.repository_owner }}" >> generated_data.txt
       - name: Get Pull Request URL
-        working-directory: $HOME/workdir
-        run: |
-         echo "Pull Request URL: ${{ github.event.pull_request.html_url }}" >> generated_data.txt  
-         cat generated_data.txt
+        run: echo "Pull Request URL: ${{ github.event.pull_request.html_url }}" >> generated_data.txt
       - name: Checkout pull request HEAD
-        id: checkout_pr_head
         uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
-          path: $HOME/workdir    
       - name: print-diff
-        working-directory: $HOME/workdir
         shell: bash
         run: |
           git fetch origin main
           git diff origin/main..HEAD > mydiff
           echo "mydiff = $(cat mydiff)" >> generated_data.txt
-          cat generated_data.txt     
+          cat generated_data.txt
       - name: Send data to API
-        working-directory: $HOME/workdir
         run: |
           curl -X POST \
-           -H "Content-Type: application/json" \
-           -d "@generated_data.txt" \
-           "https://httpbin.org/anything"
-  
+            -H "Content-Type: application/json" \
+            -d "@generated_data.txt" \
+            "https://httpbin.org/anything"
