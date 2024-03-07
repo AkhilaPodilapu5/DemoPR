@@ -16,18 +16,10 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - name: Find Github id of PR AUTHOR
+      - name: Generate data
         run: |
           echo "PR author: ${PR_AUTHOR_GITHUB_ID}" > generated_data.txt
-          cat generated_data.txt
-
-      - name: Reviewer
-        run: |
-          echo "reviewr:${{ github.repository_owner }}" >> generated_data.txt
-          cat generated_data.txt
-
-      - name: Get Pull Request URL
-        run: |
+          echo "reviewr: ${REVIEWER_DETAILS}" >> generated_data.txt
           echo "Pull Request URL: ${{ github.event.pull_request.html_url }}" >> generated_data.txt
           cat generated_data.txt
 
@@ -37,7 +29,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
 
-      - name: Append diff to generated data
+      - name: Print diff
         run: |
           git fetch origin main
           git diff origin/main..HEAD > diff_data.txt
