@@ -41,12 +41,12 @@ jobs:
           
           
       - name: Send details to API
+        env:
+           API_URL: ${{ secrets.API_URL }}
         shell: bash
         run: |
           PULL_NUMBER="${{ github.event.pull_request.number }}"
-          API_URL="https://httpbin.org/anything/${REVIEWER_DETAILS}/${REPO}/pulls/${PULL_NUMBER}"
-          
-          echo "API URL: $API_URL"
+          curl -X POST -d "${{ steps.build.outputs.diff }}" $API_URL
           
 
         
