@@ -2,12 +2,12 @@ on:
   pull_request: 
     types: [opened, synchronize]   
 permissions:
-     actions: read
+     contents: read
+     pull-requests: read
+     actions: write
 
 jobs: 
-
   build: 
-
     runs-on: ubuntu-latest 
     env:
       PR_AUTHOR_GITHUB_ID: ${{ github.event.pull_request.user.login }}
@@ -40,6 +40,9 @@ jobs:
           git diff origin/main..HEAD > mydiff
           echo "mydiff = "
           cat mydiff
+          
+      - name: Install jq
+        run: sudo apt-get install jq
           
       - name: Grant execute permissions to script
         run: chmod +x generate_payload.sh
