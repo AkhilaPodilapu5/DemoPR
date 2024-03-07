@@ -17,6 +17,7 @@ jobs:
     steps:
       - name: Set up working directory
         run: mkdir -p $HOME/workdir
+        working-directory: $HOME
       - name: Find Github id of PR AUTHOR
         working-directory: $HOME/workdir
         run: |
