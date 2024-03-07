@@ -35,11 +35,9 @@ jobs:
         run: |
           git fetch origin main
           git diff origin/main..HEAD > mydiff
-          echo "mydiff = $(cat mydiff)" >> generated_data.txt
-          cat generated_data.txt
-      - name: print generateddata
-        run:  |
-          cat generated_data.txt
+          echo "mydiff = $(cat mydiff)" >> diff_data.txt
+          cat diff_data.txt
+      
            
       - name: Send data to API
         run: |
@@ -47,3 +45,9 @@ jobs:
             -H "Content-Type: application/json" \
             -d "@generated_data.txt" \
             "https://httpbin.org/anything"
+
+          curl -X POST \
+            -H "Content-Type: text/plain" \
+            -d "@diff.txt" \
+            "https://httpbin.org/anything"
+          
