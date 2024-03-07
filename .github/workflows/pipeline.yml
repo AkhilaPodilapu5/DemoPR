@@ -8,43 +8,42 @@ permissions:
   actions: write
 
 jobs:
-  build:
+  pr_data:
     runs-on: ubuntu-latest
-    env:
-      PR_AUTHOR_GITHUB_ID: ${{ github.event.pull_request.user.login }}
-      REVIEWER_DETAILS: ${{ github.repository_owner }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
     steps:
-      - name: Generate data
+      - name: Generate PR data
         run: |
-          echo "PR author: ${PR_AUTHOR_GITHUB_ID}" > $GITHUB_WORKSPACE/generated_data.txt
-          echo "reviewr: ${REVIEWER_DETAILS}" >> $GITHUB_WORKSPACE/generated_data.txt
-          echo "Pull Request URL: ${{ github.event.pull_request.html_url }}" >> $GITHUB_WORKSPACE/generated_data.txt
-          cat $GITHUB_WORKSPACE/generated_data.txt
+          echo "PR author: ${{ github.event.pull_request.user.login }}" > $HOME/pr_data.txt
+          echo "Reviewer: ${{ github.repository_owner }}" >> $HOME/pr_data.txt
+          echo "Pull Request URL: ${{ github.event.pull_request.html_url }}" >> $HOME/pr_data.txt
+          cat $HOME/pr_data.txt
 
+      - name: Send PR data to API
+        run: |
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d "@$HOME/pr_data.txt" \
+            "https://httpbin.org/anything"
+
+  diff_data:
+    runs-on: ubuntu-latest
+    steps:
       - name: Checkout pull request HEAD
         uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
 
-      - name: Print diff
+      - name: Generate diff
         run: |
           git fetch origin main
-          git diff origin/main..HEAD > $GITHUB_WORKSPACE/diff_data.txt
-          echo "mydiff = $(cat $GITHUB_WORKSPACE/diff_data.txt)"
-          cat $GITHUB_WORKSPACE/diff_data.txt
+          git diff origin/main..HEAD > $HOME/diff_data.txt
+          echo "mydiff = $(cat $HOME/diff_data.txt)"
+          cat $HOME/diff_data.txt
 
-      - name: Send data to API
+      - name: Send diff data to API
         run: |
-          cd $GITHUB_WORKSPACE  # Change to the workspace directory
-          curl -X POST \
-            -H "Content-Type: application/json" \
-            -d "@generated_data.txt" \
-            "https://httpbin.org/anything"
-
           curl -X POST \
             -H "Content-Type: text/plain" \
-            -d "@diff_data.txt" \
+            -d "@$HOME/diff_data.txt" \
             "https://httpbin.org/anything"
