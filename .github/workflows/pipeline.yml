@@ -22,9 +22,11 @@ jobs:
       - name: Reviewer
         run: |
           echo "reviewr:${{ github.repository_owner }}" >> generated_data.txt
+          cat generated_data.txt
       - name: Get Pull Request URL
         run: |
-         echo "Pull Request URL: ${{ github.event.pull_request.html_url }}" >> generated_data.txt    
+         echo "Pull Request URL: ${{ github.event.pull_request.html_url }}" >> generated_data.txt  
+         cat generated_data.txt
       - name: Checkout pull request HEAD
         id: checkout_pr_head
         uses: actions/checkout@v2
