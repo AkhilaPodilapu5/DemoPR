@@ -10,6 +10,7 @@ payload='{
   "diff": "'"$diff_data"'",
   "authorId": "'"$author_id"'",
   "reviewerDetails": "'"$reviewer_details"'"
+  "pull_request_url": "'"$pull_request_url"'"
 }'
 
 # Save payload to a file
