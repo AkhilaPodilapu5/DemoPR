@@ -38,12 +38,8 @@ jobs:
         run: |
           git fetch origin main
           git diff origin/main..HEAD > mydiff
-          echo "mydiff = "
-          cat mydiff    
-      - name: Print generated_data.txt
-        run: |
-          pwd
-          cat generated_data.txt
+          echo "mydiff = $mydiff "  >>generated_data.txt
+          cat generated_data.txt     
       - name: Send data to API
         run: |
           curl -X POST \
