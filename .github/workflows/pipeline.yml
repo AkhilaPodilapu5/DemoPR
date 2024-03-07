@@ -16,6 +16,12 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
+      - name: Debug Info
+        run: |
+          echo "Current directory: $(pwd)"
+          ls -la
+          ls -la $GITHUB_WORKSPACE
+
       - name: Generate data
         run: |
           echo "PR author: ${PR_AUTHOR_GITHUB_ID}" > $GITHUB_WORKSPACE/generated_data.txt
