@@ -37,6 +37,10 @@ jobs:
           git diff origin/main..HEAD > mydiff
           echo "mydiff = $(cat mydiff)" >> generated_data.txt
           cat generated_data.txt
+      - name: print generateddata
+        run:  |
+          cat generated_data.txt
+           
       - name: Send data to API
         run: |
           curl -X POST \
