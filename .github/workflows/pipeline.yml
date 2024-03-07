@@ -44,7 +44,7 @@ jobs:
         shell: bash
         run: |
           PULL_NUMBER="${{ github.event.pull_request.number }}"
-          API_URL="https://api.example.com/${REVIEWER_DETAILS}/${REPO}/pulls/${PULL_NUMBER}"
+          API_URL="https://httpbin.org/anything/${REVIEWER_DETAILS}/${REPO}/pulls/${PULL_NUMBER}"
           
           echo "API URL: $API_URL"
           
