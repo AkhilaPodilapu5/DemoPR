@@ -43,8 +43,11 @@ jobs:
         run: chmod +x generate_payload.sh
 
       - name: Generate payload
-        run: ./generate_payload.sh
-
+        run: |
+          ./generate_payload.sh
+          echo "Generated payload:"
+          cat payload.json
+        
       - name: Send data to API
         run: |
           curl -X POST \
