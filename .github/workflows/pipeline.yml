@@ -31,10 +31,6 @@ jobs:
           echo "Pull Request URL: ${{ github.event.pull_request.html_url }}" >> generated_data.txt
           cat generated_data.txt
 
-      # Store generated data externally
-      - name: Store generated data
-        run: mv generated_data.txt $GITHUB_WORKSPACE/
-
       - name: Checkout pull request HEAD
         uses: actions/checkout@v2
         with:
@@ -44,18 +40,18 @@ jobs:
       - name: Append diff to generated data
         run: |
           git fetch origin main
-          git diff origin/main..HEAD > $GITHUB_WORKSPACE/diff_data.txt
-          echo "mydiff = $(cat $GITHUB_WORKSPACE/diff_data.txt)"
-          cat $GITHUB_WORKSPACE/diff_data.txt
+          git diff origin/main..HEAD > diff_data.txt
+          echo "mydiff = $(cat diff_data.txt)"
+          cat diff_data.txt
 
       - name: Send data to API
         run: |
           curl -X POST \
             -H "Content-Type: application/json" \
-            -d "@$GITHUB_WORKSPACE/generated_data.txt" \
+            -d "@generated_data.txt" \
             "https://httpbin.org/anything"
 
           curl -X POST \
             -H "Content-Type: text/plain" \
-            -d "@$GITHUB_WORKSPACE/diff_data.txt" \
+            -d "@diff_data.txt" \
             "https://httpbin.org/anything"
