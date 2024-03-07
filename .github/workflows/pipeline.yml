@@ -39,8 +39,9 @@ jobs:
           cat diff_data.txt
       - name: see the details in generated data and diff
         run: |
+          cat generated_data.txt
           cat diff_data.txt
-          cat generated_data.txt 
+           
            
       - name: Send data to API
         run: |
