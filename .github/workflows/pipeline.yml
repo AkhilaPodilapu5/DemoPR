@@ -39,14 +39,24 @@ jobs:
           echo "mydiff = "
           cat mydiff
           
-          
-      - name: Send details to API
-        env:
-           API_URL: https://httpbin.org/anything
-        shell: bash
+      - name: Grant execute permissions to script
+        run: chmod +x generate_payload.sh
+
+      - name: Generate payload
+        run: ./generate_payload.sh
+
+      - name: Set up environment variables
         run: |
-          PULL_NUMBER="${{ github.event.pull_request.number }}"
-          curl -X POST -d "${{ steps.outputs.mydiff }}" $API_URL
+           echo "PAYLOAD_FILE_CONTENT=$(cat payload.json)" >> $GITHUB_ENV
+           echo "API_ENDPOINT=https://httpbin.org/anything" >> $GITHUB_ENV
+
+      - name: Send data to API
+        run: |
+          curl -X POST \
+           -H "Content-Type: application/json" \
+           -d "$PAYLOAD_FILE_CONTENT" \
+            "$API_ENDPOINT"    
+      
           
 
         
