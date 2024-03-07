@@ -17,11 +17,13 @@ jobs:
 
     steps:
       - name: Find Github id of PR AUTHOR
-        run: echo "PR author: ${PR_AUTHOR_GITHUB_ID}" >> generated_data.txt
+        run: |
+          echo "PR author: ${PR_AUTHOR_GITHUB_ID}" >> generated_data.txt
       - name: Reviewer
         run: echo "reviewr:${{ github.repository_owner }}" >> generated_data.txt
       - name: Get Pull Request URL
-        run: echo "Pull Request URL: ${{ github.event.pull_request.html_url }}" >> generated_data.txt
+        run: |
+          echo "Pull Request URL: ${{ github.event.pull_request.html_url }}" >> generated_data.txt
       - name: Checkout pull request HEAD
         uses: actions/checkout@v2
         with:
