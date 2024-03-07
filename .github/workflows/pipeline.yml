@@ -40,10 +40,10 @@ jobs:
         run: |
           curl -X POST \
             -H "Content-Type: application/json" \
-            -d "@generated_data.txt" \
+            -d "@./generated_data.txt" \
             "https://httpbin.org/anything"
 
           curl -X POST \
             -H "Content-Type: text/plain" \
-            -d "@diff_data.txt" \
+            -d "@./diff_data.txt" \
             "https://httpbin.org/anything"
