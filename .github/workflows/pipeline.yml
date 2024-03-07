@@ -18,6 +18,7 @@ jobs:
       - name: Find Github id of PR AUTHOR
         run: |
           echo "PR author: ${PR_AUTHOR_GITHUB_ID}" >> generated_data.txt
+          cat generated_data.txt
       - name: Reviewer
         run: |
           echo "reviewr:${{ github.repository_owner }}" >> generated_data.txt
