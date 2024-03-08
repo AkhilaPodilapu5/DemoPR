@@ -1,0 +1,48 @@
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: read
+  actions: write
+
+jobs:
+  pr_data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate PR data
+        run: |
+          echo "PR author: ${{ github.event.pull_request.user.login }}" > generated_data.txt
+          echo "Reviewer: ${{ github.repository_owner }}" >> generated_data.txt
+          echo "Pull Request URL: ${{ github.event.pull_request.html_url }}" >> generated_data.txt
+          cat generated_data.txt
+      - name: Send PR data to API
+        run: |
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d "@generated_data.txt" \
+            "https://httpbin.org/anything"
+
+  diff_data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout pull request HEAD
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - name: Install diffstat
+        run: sudo apt-get install -y diffstat
+      - name: Generate diff
+        run: |
+          git fetch origin main
+          git diff --unified=0 origin/main..HEAD > diff_data.txt
+          diffstat diff_data.txt
+          cat diff_data.txt          
+      - name: Send diff data to API
+        run: |
+          curl -X POST \
+            -H "Content-Type: text/plain" \
+            -d "@diff_data.txt" \
+            "https://httpbin.org/anything" 
