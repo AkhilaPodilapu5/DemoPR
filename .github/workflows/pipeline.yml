@@ -6,59 +6,30 @@ permissions:
      pull-requests: read
      actions: write
 
-jobs: 
-  build: 
-    runs-on: ubuntu-latest 
-    env:
-      PR_AUTHOR_GITHUB_ID: ${{ github.event.pull_request.user.login }}
-      REVIEWER_DETAILS: ${{ github.repository_owner }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
+jobs:
+  pr_data:
+    runs-on: ubuntu-latest
     steps:
-      - name: Find Github id of PR AUTHOR
+      - name: Generate PR data
         run: |
-          echo "PR author: ${PR_AUTHOR_GITHUB_ID}"
-      - name: Reviewer
-        run: |
-          echo "reviewr:${{ github.repository_owner }}"
-      - name: Get Pull Request URL
-        run: |
-         echo "Pull Request URL: ${{ github.event.pull_request.html_url }}"
-     
-      - name: Checkout pull request HEAD
-        id: checkout_pr_head
-        uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          fetch-depth: 0
-          
-          
-      - name: print-diff
-        shell: bash
-        run: |
-          git fetch origin main
-          git diff origin/main..HEAD > mydiff
-          echo "mydiff = "
-          cat mydiff
-          
-      - name: Install jq
-        run: sudo apt-get install jq
-          
-      - name: Grant execute permissions to script
-        run: chmod +x generate_payload.sh
+          # Fetch user information using GitHub REST API
+          USER_DATA=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/users/${{ github.event.pull_request.user.login }}")
+          USER_EMAIL=$(echo "$USER_DATA" | jq -r .email)
 
-      - name: Generate payload
-        run: |
-          ./generate_payload.sh
-          echo "Generated payload:"
-          cat payload.json
-        
-      - name: Send data to API
+          echo "PR author: ${{ github.event.pull_request.user.login }}"
+          echo "PR author email: $USER_EMAIL" > generated_data.txt
+          echo "Reviewer: ${{ github.repository_owner }}" >> generated_data.txt
+          echo "Pull Request URL: ${{ github.event.pull_request.html_url }}" >> generated_data.txt
+          cat generated_data.txt
+
+      - name: Send PR data to API
         run: |
           curl -X POST \
-           -H "Content-Type: application/json" \
-           -d "$(cat payload.json)" \
-           "https://httpbin.org/anything"   
+            -H "Content-Type: application/json" \
+            -d "@generated_data.txt" \
+            "https://httpbin.org/anything"
+
+     
       
           
 
