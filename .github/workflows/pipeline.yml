@@ -10,23 +10,36 @@ jobs:
   pr_data:
     runs-on: ubuntu-latest
     steps:
-      - name: Generate PR data
+      - name: Fetch author information
         run: |
-          # Fetch user information using GitHub REST API
-          USER_DATA=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/users/${{ github.event.pull_request.user.login }}")
-          USER_EMAIL=$(echo "$USER_DATA" | jq -r '.email // "Email not public"')
+          AUTHOR_DATA=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/users/${{ github.event.pull_request.user.login }}")
+          AUTHOR_ID=$(echo "$AUTHOR_DATA" | jq -r .id)
 
-          echo "PR author: ${{ github.event.pull_request.user.login }}"
-          echo "PR author email: $USER_EMAIL" > generated_data.txt
-          echo "Reviewer: ${{ github.repository_owner }}" >> generated_data.txt
-          echo "Pull Request URL: ${{ github.event.pull_request.html_url }}" >> generated_data.txt
-          cat generated_data.txt
-
-          # Exit with an error if email is null
-          if [ "$USER_EMAIL" = "null" ]; then
-            echo "Error: Contributor has not made their email address public."
+          # Exit with an error if ID is null
+          if [ "$AUTHOR_ID" = "null" ]; then
+            echo "Error: Unable to fetch user ID for PR author."
             exit 1
           fi
+
+      - name: Fetch owner information
+        run: |
+          OWNER_DATA=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/users/${{ github.repository_owner }}")
+          OWNER_ID=$(echo "$OWNER_DATA" | jq -r .id)
+
+          # Exit with an error if ID is null
+          if [ "$OWNER_ID" = "null" ]; then
+            echo "Error: Unable to fetch user ID for repository owner."
+            exit 1
+          fi
+
+      - name: Generate PR data
+        run: |
+          echo "PR author: ${{ github.event.pull_request.user.login }}"
+          echo "PR author ID: $AUTHOR_ID" > generated_data.txt
+          echo "Reviewer: ${{ github.repository_owner }}"
+          echo "Reviewer ID: $OWNER_ID" >> generated_data.txt
+          echo "Pull Request URL: ${{ github.event.pull_request.html_url }}" >> generated_data.txt
+          cat generated_data.txt
 
       - name: Send PR data to API
         run: |
@@ -34,10 +47,6 @@ jobs:
             -H "Content-Type: application/json" \
             -d "@generated_data.txt" \
             "https://httpbin.org/anything"
-
      
-      
-          
-
         
           
