@@ -34,13 +34,16 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
 
+      - name: Install diffstat
+        run: sudo apt-get install -y diffstat
+
       - name: Generate diff
         run: |
           git fetch origin main
-          git diff origin/main..HEAD > diff_data.txt
-          echo "mydiff = $(cat diff_data.txt)"
+          git diff --unified=0 origin/main..HEAD > diff_data.txt
+          diffstat diff_data.txt
           cat diff_data.txt
-
+          
       - name: Send diff data to API
         run: |
           curl -X POST \
